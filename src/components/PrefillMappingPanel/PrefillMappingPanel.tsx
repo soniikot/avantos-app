@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { PrefillSourceModal } from "../PrefillSourceModal/PrefillSourceModal";
+import styles from './styles.module.css';
 
 // Helper: get form schema for a node
 function getFormSchema(node: any, forms: any[]) {
@@ -117,20 +119,9 @@ export const PrefillMappingPanel = ({
   }
 
   return (
-    <div
-      style={{
-        position: "absolute",
-        right: 0,
-        top: 0,
-        width: 350,
-        background: "#fff",
-        border: "1px solid #ccc",
-        padding: 16,
-        zIndex: 10
-      }}
-    >
-      <h3>Prefill</h3>
-      <div style={{ marginBottom: 16, color: "#666" }}>
+    <div className={styles.panel}>
+      <h3 className={styles.title}>Prefill</h3>
+      <div className={styles.description}>
         Prefill fields for this form
       </div>
       <div>
@@ -147,30 +138,13 @@ export const PrefillMappingPanel = ({
               sourceFormName = "Global";
             }
             return (
-              <div
-                key={field}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  background: "#eee",
-                  borderRadius: 20,
-                  padding: "6px 16px",
-                  marginBottom: 8,
-                  fontSize: 16
-                }}
-              >
+              <div key={field} className={styles.mappedField}>
                 <span>
                   <b>{field}</b>: {sourceFormName}.{mapping.sourceField}
                 </span>
                 <button
                   onClick={() => handleRemoveMapping(field)}
-                  style={{
-                    marginLeft: "auto",
-                    background: "none",
-                    border: "none",
-                    fontSize: 20,
-                    cursor: "pointer"
-                  }}
+                  className={styles.removeButton}
                   aria-label="Remove mapping"
                 >
                   ×
@@ -181,19 +155,10 @@ export const PrefillMappingPanel = ({
             return (
               <div
                 key={field}
-                style={{
-                  border: "2px dashed #3399cc",
-                  borderRadius: 8,
-                  padding: "10px 16px",
-                  marginBottom: 8,
-                  color: "#3399cc",
-                  background: "#f7fbfd",
-                  cursor: "pointer",
-                  fontSize: 16
-                }}
+                className={styles.unmappedField}
                 onClick={() => setModalField(field)}
               >
-                <span style={{ marginRight: 8, fontSize: 18 }}>🗄️</span>
+                <span className={styles.fieldIcon}>🗄️</span>
                 {field}
               </div>
             );
@@ -201,56 +166,15 @@ export const PrefillMappingPanel = ({
         })}
       </div>
       {modalField && (
-        <div
-          style={{
-            position: "fixed",
-            left: 0,
-            top: 0,
-            width: "100vw",
-            height: "100vh",
-            background: "rgba(0,0,0,0.2)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center"
-          }}
-        >
-          <div style={{ background: "#fff", padding: 24, borderRadius: 8 }}>
-            <h4>
-              Select prefill source for <b>{modalField}</b>
-            </h4>
-            <div>
-              {sources.map(source => (
-                <div key={source.label} style={{ marginBottom: 8 }}>
-                  <div>
-                    <b>{source.label}</b>
-                  </div>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                    {source.fields.map(f => (
-                      <button
-                        key={f.formId + f.field}
-                        onClick={() =>
-                          handleSelectPrefillSource(modalField, {
-                            sourceType:
-                              f.formId === "global" ? "global" : "form",
-                            sourceFormId: f.formId,
-                            sourceField: f.field
-                          })
-                        }
-                      >
-                        {f.field}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <button onClick={() => setModalField(null)} style={{ marginTop: 16 }}>
-              Cancel
-            </button>
-          </div>
-        </div>
+        <PrefillSourceModal
+          open={!!modalField}
+          onClose={() => setModalField(null)}
+          onSelect={(mapping) => handleSelectPrefillSource(modalField, mapping)}
+          sources={sources}
+          fieldName={modalField}
+        />
       )}
-      <button onClick={onClose} style={{ marginTop: 16 }}>
+      <button onClick={onClose} className={styles.closeButton}>
         Close
       </button>
     </div>

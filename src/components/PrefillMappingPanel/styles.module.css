@@ -1,0 +1,57 @@
+.panel {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 350px;
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 16px;
+    z-index: 10;
+  }
+  
+  .title {
+    margin-top: 0;
+  }
+  
+  .description {
+    margin-bottom: 16px;
+    color: #666;
+  }
+  
+  .mappedField {
+    display: flex;
+    align-items: center;
+    background: #eee;
+    border-radius: 20px;
+    padding: 6px 16px;
+    margin-bottom: 8px;
+    font-size: 16px;
+  }
+  
+  .unmappedField {
+    border: 2px dashed #3399cc;
+    border-radius: 8px;
+    padding: 10px 16px;
+    margin-bottom: 8px;
+    color: #3399cc;
+    background: #f7fbfd;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .fieldIcon {
+    margin-right: 8px;
+    font-size: 18px;
+  }
+  
+  .removeButton {
+    margin-left: auto;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  
+  .closeButton {
+    margin-top: 16px;
+  }

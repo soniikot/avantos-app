@@ -1,9 +1,9 @@
 import { ReactFlow, Controls, Background, Handle, Position } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { useQuery } from "@tanstack/react-query";
-import { fetchGraph } from "../service/fetchGraph";
+import { fetchGraph } from "../../service/fetchGraph";
 import { useEffect, useState, useMemo } from 'react';
-import { PrefillMappingPanel } from './PrefillMappingPanel';
+import { PrefillMappingPanel } from '../PrefillMappingPanel/PrefillMappingPanel';
 
 interface EdgeData {
     source: string;

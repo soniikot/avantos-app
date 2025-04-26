@@ -1,0 +1,23 @@
+.graphContainer {
+    width: 600px;
+    height: 600px;
+    border: 2px solid blue;
+  }
+  
+  .formNode {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #6495ed;
+    background-color: #f0f8ff;
+    min-width: 150px;
+    text-align: center;
+    position: relative;
+  }
+  
+  .formNodeTitle {
+    font-weight: bold;
+  }
+  
+  .nodeHandle {
+    background: #555;
+  }
