@@ -3,6 +3,7 @@ import '@xyflow/react/dist/style.css';
 import { useQuery } from "@tanstack/react-query";
 import { fetchGraph } from "../service/fetchGraph";
 import { useEffect, useState, useMemo } from 'react';
+import { PrefillMappingPanel } from './PrefillMappingPanel';
 
 interface EdgeData {
     source: string;
@@ -12,7 +13,23 @@ interface EdgeData {
 
 interface FormNodeData {
     name: string;
+    input_mapping: Record<string, string>;
 }
+
+interface Node {
+    id: string;
+    type: string;
+    position: {
+      x: number;
+      y: number;
+    };
+    data: {
+      name: string;
+      input_mapping?: Record<string, string>;
+      [key: string]: any; 
+    };
+  }
+
 
 const FormNode = ({ data }: { data: FormNodeData }) => {
     return (
@@ -31,7 +48,8 @@ const FormNode = ({ data }: { data: FormNodeData }) => {
           id="b"
           style={{ background: '#555' }}
         />
-        
+
+
         <div style={{ fontWeight: 'bold' }}>{data.name || 'Form'}</div>
         
         <Handle
@@ -47,19 +65,23 @@ const FormNode = ({ data }: { data: FormNodeData }) => {
 export function Graph() {
   const nodeTypes = useMemo(() => ({ form: FormNode }), []);
   
-  const [nodes, setNodes] = useState([]);
+  const [nodes, setNodes] = useState<Node[]>([]);
   const [edges,setEdges] = useState([]);
+  const [selectedNode, setSelectedNode] = useState<any>(null);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["graph-data"],
     queryFn: fetchGraph,
   });
   
+    const onNodeClick = (event: any, node: any) => {
+        setSelectedNode(node);
+      };
 
   useEffect(() => {
     if (data) { 
         const processedEdges = data.edges.map((edge: EdgeData, index:number) => ({
-            id: `e${index}`,
+            id: `${index}`,
             source: edge.source,
             target: edge.target,
             sourceHandle: "a",
@@ -87,10 +109,30 @@ export function Graph() {
         edges={edges}
         nodeTypes={nodeTypes}
         fitView
+        onNodeClick={onNodeClick}
       >
         <Controls />
         <Background />
       </ReactFlow>
+      {selectedNode && (
+  <PrefillMappingPanel
+    node={selectedNode}
+    nodes={nodes}
+    edges={edges}
+    data={data} 
+    onClose={() => setSelectedNode(null)}
+    onSave={(nodeId, inputMapping) => {
+      setNodes(currentNodes =>
+        currentNodes.map(node =>
+          node.id === nodeId
+            ? { ...node, data: { ...node.data, input_mapping: inputMapping } }
+            : node
+        )
+      );
+      
+    }}
+  />
+)}
     </div>
   );
 }
