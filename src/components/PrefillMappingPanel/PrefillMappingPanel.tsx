@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { PrefillSourceModal } from "../PrefillSourceModal/PrefillSourceModal";
-import styles from './styles.module.css';
+import { Node } from "../../types/types";
+import { Edge } from  '@xyflow/react';
+
 
 // Helper: get form schema for a node
 function getFormSchema(node: any, forms: any[]) {
@@ -44,9 +46,9 @@ export const PrefillMappingPanel = ({
   onClose,
   onSave
 }: {
-  node: any;
-  nodes: any[];
-  edges: any[];
+  node: Node;
+  nodes: Node[];
+  edges: Edge[];
   data: any;
   onClose: () => void;
   onSave: (nodeId: string, inputMapping: any) => void;
@@ -119,9 +121,20 @@ export const PrefillMappingPanel = ({
   }
 
   return (
-    <div className={styles.panel}>
-      <h3 className={styles.title}>Prefill</h3>
-      <div className={styles.description}>
+    <div
+      style={{
+        position: "absolute",
+        right: 0,
+        top: 0,
+        width: 350,
+        background: "#fff",
+        border: "1px solid #ccc",
+        padding: 16,
+        zIndex: 10
+      }}
+    >
+      <h3>Prefill</h3>
+      <div style={{ marginBottom: 16, color: "#666" }}>
         Prefill fields for this form
       </div>
       <div>
@@ -138,13 +151,30 @@ export const PrefillMappingPanel = ({
               sourceFormName = "Global";
             }
             return (
-              <div key={field} className={styles.mappedField}>
+              <div
+                key={field}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  background: "#eee",
+                  borderRadius: 20,
+                  padding: "6px 16px",
+                  marginBottom: 8,
+                  fontSize: 16
+                }}
+              >
                 <span>
                   <b>{field}</b>: {sourceFormName}.{mapping.sourceField}
                 </span>
                 <button
                   onClick={() => handleRemoveMapping(field)}
-                  className={styles.removeButton}
+                  style={{
+                    marginLeft: "auto",
+                    background: "none",
+                    border: "none",
+                    fontSize: 20,
+                    cursor: "pointer"
+                  }}
                   aria-label="Remove mapping"
                 >
                   ×
@@ -155,10 +185,19 @@ export const PrefillMappingPanel = ({
             return (
               <div
                 key={field}
-                className={styles.unmappedField}
+                style={{
+                  border: "2px dashed #3399cc",
+                  borderRadius: 8,
+                  padding: "10px 16px",
+                  marginBottom: 8,
+                  color: "#3399cc",
+                  background: "#f7fbfd",
+                  cursor: "pointer",
+                  fontSize: 16
+                }}
                 onClick={() => setModalField(field)}
               >
-                <span className={styles.fieldIcon}>🗄️</span>
+                <span style={{ marginRight: 8, fontSize: 18 }}>🗄️</span>
                 {field}
               </div>
             );
@@ -166,15 +205,16 @@ export const PrefillMappingPanel = ({
         })}
       </div>
       {modalField && (
-        <PrefillSourceModal
-          open={!!modalField}
-          onClose={() => setModalField(null)}
-          onSelect={(mapping) => handleSelectPrefillSource(modalField, mapping)}
-          sources={sources}
-          fieldName={modalField}
-        />
-      )}
-      <button onClick={onClose} className={styles.closeButton}>
+         <PrefillSourceModal
+         open={!!modalField}
+         onClose={() => setModalField(null)}
+         onSelect={(mapping) => handleSelectPrefillSource(modalField, mapping)}
+         sources={sources}
+         fieldName={modalField}
+       />
+           
+          )}
+      <button onClick={onClose} style={{ marginTop: 16 }}>
         Close
       </button>
     </div>
