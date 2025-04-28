@@ -70,11 +70,11 @@ export function Graph() {
     edges={edges}
     forms={data.forms} 
     onClose={() => setSelectedNode(null)}
-    onSave={(nodeId) => {
+    onSave={(nodeId, inputMapping) => {
       setNodes(currentNodes =>
         currentNodes.map(node =>
           node.id === nodeId
-            ? { ...node, data: { ...node.data,  } }
+          ? { ...node, data: { ...node.data, input_mapping: inputMapping } }
             : node
         )
       );
