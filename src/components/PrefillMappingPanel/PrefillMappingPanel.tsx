@@ -8,7 +8,7 @@ import styles from './styles.module.css';
 interface FormSchema {
   id: string;
   field_schema: {
-    
+
     properties: Record<string, any>;
   };
 }
@@ -30,7 +30,6 @@ interface MappingData {
   sourceField: string;
 }
 
-
 // Helper: get form schema for a node
 function getFormSchema(node: Node, forms: FormSchema[]){
   return forms.find(f => f.id === node.data.component_id);
@@ -40,6 +39,7 @@ function getFormSchema(node: Node, forms: FormSchema[]){
 function getFieldNames(formSchema: FormSchema): string[] {
   return Object.keys(formSchema.field_schema.properties);
 }
+
 
 // Helper: get direct and transitive dependencies
 function getUpstreamForms(node: Node, nodes: Node[]): Node[] {
@@ -88,56 +88,37 @@ export const PrefillMappingPanel = ({
   );
 
   const formSchema = getFormSchema(node, forms);
-  if (!formSchema) return <div>Form schema not found.</div>;
-  console.log(formSchema);
-  const fieldNames = getFieldNames(formSchema);
+  const fieldNames = formSchema ? getFieldNames(formSchema) : [];
 
-  // Data sources
-  const directDeps = (node.data.prerequisites || []).map((id: string) =>
-    nodes.find(n => n.id === id)
-  ).filter(Boolean) as Node[];
-  
-  const transitiveDeps = getUpstreamForms(node, nodes).filter(
-    n => !directDeps.includes(n)
-  );
+  // Get all upstream forms in one collection
+const allDependencyForms = getUpstreamForms(node, nodes);
 
-  // Define sources for the modal
-  const sources: SourceData[] = [
-    ...directDeps.map(dep => {
-      const depSchema = getFormSchema(dep, forms);
-      if (!depSchema) return null;
-      
-      return {
-        label: `Direct: ${dep.data.name}`,
-        fields: getFieldNames(depSchema).map(f => ({
-          field: f,
-          formName: dep.data.name,
-          formId: dep.id
-        }))
-      };
-    }),
-    ...transitiveDeps.map(dep => {
-      const depSchema = getFormSchema(dep, forms);
-      if (!depSchema) return null;
-      
-      return {
-        label: `Transitive: ${dep.data.name}`,
-        fields: getFieldNames(depSchema).map(f => ({
-          field: f,
-          formName: dep.data.name,
-          formId: dep.id
-        }))
-      };
-    }),
-    {
-      label: "Global Data",
-      fields: globalFields.map(f => ({
-        field: f.field,
-        formName: "Global",
-        formId: "global"
+// Define sources for the modal with simplified categories
+const sources: SourceData[] = [
+
+  ...allDependencyForms.map(dep => {
+    const depSchema = getFormSchema(dep, forms);
+    if (!depSchema) return null;
+    
+    return {
+      label: `Form: ${dep.data.name}`,  
+      fields: getFieldNames(depSchema).map(f => ({
+        field: f,
+        formName: dep.data.name,
+        formId: dep.id
       }))
-    }
-  ].filter(Boolean) as SourceData[];
+    };
+  }),
+  
+  {
+    label: "Global Data",
+    fields: globalFields.map(f => ({
+      field: f.field,
+      formName: "Global",
+      formId: "global"
+    }))
+  }
+].filter(Boolean) as SourceData[];
 
   function handleRemoveMapping(field: string): void {
     const newMapping = { ...inputMapping };
