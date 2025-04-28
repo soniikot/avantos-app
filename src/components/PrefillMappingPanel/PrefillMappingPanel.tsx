@@ -8,6 +8,7 @@ import styles from './styles.module.css';
 interface FormSchema {
   id: string;
   field_schema: {
+    
     properties: Record<string, any>;
   };
 }
@@ -29,13 +30,9 @@ interface MappingData {
   sourceField: string;
 }
 
-interface PanelData {
-  forms: FormSchema[];
-  // Add other properties as needed
-}
 
 // Helper: get form schema for a node
-function getFormSchema(node: Node, forms: FormSchema[]): FormSchema | undefined {
+function getFormSchema(node: Node, forms: FormSchema[]){
   return forms.find(f => f.id === node.data.component_id);
 }
 
@@ -74,14 +71,14 @@ const globalFields = [
 export const PrefillMappingPanel = ({
   node,
   nodes,
-  data,
+  forms,
   onClose,
   onSave
 }: {
   node: Node;
   nodes: Node[];
   edges: Edge[];
-  data: PanelData;
+  forms: FormSchema[];
   onClose: () => void;
   onSave: (nodeId: string, inputMapping: Record<string, MappingData>) => void;
 }) => {
@@ -90,8 +87,9 @@ export const PrefillMappingPanel = ({
     node.data.input_mapping || {}
   );
 
-  const formSchema = getFormSchema(node, data.forms);
+  const formSchema = getFormSchema(node, forms);
   if (!formSchema) return <div>Form schema not found.</div>;
+  console.log(formSchema);
   const fieldNames = getFieldNames(formSchema);
 
   // Data sources
@@ -106,7 +104,7 @@ export const PrefillMappingPanel = ({
   // Define sources for the modal
   const sources: SourceData[] = [
     ...directDeps.map(dep => {
-      const depSchema = getFormSchema(dep, data.forms);
+      const depSchema = getFormSchema(dep, forms);
       if (!depSchema) return null;
       
       return {
@@ -119,7 +117,7 @@ export const PrefillMappingPanel = ({
       };
     }),
     ...transitiveDeps.map(dep => {
-      const depSchema = getFormSchema(dep, data.forms);
+      const depSchema = getFormSchema(dep, forms);
       if (!depSchema) return null;
       
       return {

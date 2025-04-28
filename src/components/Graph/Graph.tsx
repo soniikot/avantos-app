@@ -68,7 +68,7 @@ export function Graph() {
     node={selectedNode}
     nodes={nodes}
     edges={edges}
-    data={data} 
+    forms={data.forms} 
     onClose={() => setSelectedNode(null)}
     onSave={(nodeId) => {
       setNodes(currentNodes =>

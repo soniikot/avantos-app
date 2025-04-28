@@ -10,6 +10,7 @@ export interface NodeData {
   input_mapping?: Record<string, any>;
   prerequisites?: string[];
   component_id?: string;
+  [key: string]: unknown;
 }
 
 export interface Node {
@@ -19,5 +20,5 @@ export interface Node {
     x:number;
     y:number;
   };
-  data:NodeData;
+  data: NodeData; 
 }
