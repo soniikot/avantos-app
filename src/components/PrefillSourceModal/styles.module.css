@@ -189,17 +189,20 @@
     cursor: pointer;
   }
   
+
+  
   .expandIcon {
-    margin-right: 6px;
+    cursor: pointer;
+    margin-right: 8px;
     transition: transform 0.2s ease;
   }
   
-  .expandIconRotated {
+  .expanded {
     transform: rotate(90deg);
   }
   
-  .expandIconNormal {
-    transform: rotate(0);
+  .collapsed {
+    transform: rotate(0deg); 
   }
   
   .formLabel {
