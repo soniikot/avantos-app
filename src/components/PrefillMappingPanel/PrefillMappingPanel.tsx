@@ -49,10 +49,17 @@ function getUpstreamForms(node: Node, nodes: Node[]): Node[] {
   function dfs(n: Node): void {
     if (visited.has(n.id)) return;
     visited.add(n.id);
-    for (const prereqId of n.data.prerequisites || []) {
+    
+
+    const prerequisites = n.data.prerequisites || [];
+    
+    for (const prereqId of prerequisites) {
       const prereqNode = nodes.find(x => x.id === prereqId);
       if (prereqNode) {
-        result.push(prereqNode);
+        // Add to result if not already added
+        if (!result.some(existingNode => existingNode.id === prereqNode.id)) {
+          result.push(prereqNode);
+        }
         dfs(prereqNode);
       }
     }
