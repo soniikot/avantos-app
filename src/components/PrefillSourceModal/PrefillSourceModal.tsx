@@ -1,30 +1,46 @@
 import React, { useState } from 'react';
 import styles from "./styles.module.css";
 
+// Define types for the component props
+interface FieldData {
+  field: string;
+  formName: string;
+  formId: string;
+}
+
+interface SourceData {
+  label: string;
+  fields: FieldData[];
+}
+
+interface MappingData {
+  sourceType: "global" | "form";
+  sourceFormId: string;
+  sourceField: string;
+}
+
 interface PrefillSourceModalProps {
   open: boolean;
   onClose: () => void;
-  onSelect: (source: { sourceType: string; sourceFormId: string; sourceField: string }) => void;
-  sources: Array<{
-    label: string;
-    fields: Array<{
-      field: string;
-      formName: string;
-      formId: string;
-    }>;
-  }>;
+  onSelect: (mapping: MappingData) => void;
+  sources: SourceData[];
   fieldName: string;
 }
-  
-export const PrefillSourceModal = ( open, onClose, onSelect, sources, fieldName ) => {
+
+export const PrefillSourceModal: React.FC<PrefillSourceModalProps> = ({ 
+  open, 
+  onClose, 
+  onSelect, 
+  sources, 
+  fieldName 
+}) => {
   if (!open) return null;
   
-  const [searchTerm, setSearchTerm] = useState("");
-  const [expandedItems, setExpandedItems] = useState({
-  });
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
   
   // Toggle expansion state of an item
-  const toggleItem = (itemLabel) => {
+  const toggleItem = (itemLabel: string): void => {
     setExpandedItems(prev => ({
       ...prev,
       [itemLabel]: !prev[itemLabel]
@@ -32,7 +48,7 @@ export const PrefillSourceModal = ( open, onClose, onSelect, sources, fieldName 
   };
   
   // Filter sources and fields based on search term
-  const getFilteredSources = () => {
+  const getFilteredSources = (): SourceData[] => {
     if (!searchTerm.trim()) {
       return sources;
     }
@@ -56,7 +72,7 @@ export const PrefillSourceModal = ( open, onClose, onSelect, sources, fieldName 
         
         return null;
       })
-      .filter(Boolean);
+      .filter(Boolean) as SourceData[];
   };
   
   const filteredSources = getFilteredSources();
@@ -211,9 +227,15 @@ export const PrefillSourceModal = ( open, onClose, onSelect, sources, fieldName 
             </div>
           </div>
           
-          {/* Right panel (empty as in your screenshot) */}
+         
           <div className={styles.rightPanel}>
-            {/* This area is empty in your design */}
+            {/* You could show selected field info here */}
+            {fieldName && (
+              <div className={styles.selectedField}>
+                <h3 className={styles.rightPanelTitle}>Selected Field</h3>
+                <p>{fieldName}</p>
+              </div>
+            )}
           </div>
         </div>
         
@@ -235,4 +257,4 @@ export const PrefillSourceModal = ( open, onClose, onSelect, sources, fieldName 
       </div>
     </div>
   );
-}
+};

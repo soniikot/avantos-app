@@ -1,4 +1,4 @@
-import { ReactFlow, Controls, Background } from '@xyflow/react';
+import { ReactFlow, Controls, Background, NodeMouseHandler } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { useQuery } from "@tanstack/react-query";
 import { fetchGraph } from "../../service/fetchGraph";
@@ -6,11 +6,12 @@ import { useEffect, useState, useMemo } from 'react';
 import { PrefillMappingPanel } from '../PrefillMappingPanel/PrefillMappingPanel';
 import { EdgeData, Node } from '../../types/types';
 import { FormNode } from '../FormNode/FormNode';
+import styles from "./styles.module.css"
 
 
 export function Graph() {
-  const nodeTypes = useMemo(() => ({ form: FormNode }), []);
-  
+  const nodeTypes = useMemo(() => ({ form: FormNode  }), []);
+
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges,setEdges] = useState([]);
   const [selectedNode, setSelectedNode] = useState<any>(null);
@@ -20,7 +21,7 @@ export function Graph() {
     queryFn: fetchGraph,
   });
   
-    const onNodeClick = (event, node:Node ) => {
+    const onNodeClick: NodeMouseHandler = (_event, node) => {
         setSelectedNode(node);
       };
 
@@ -30,8 +31,8 @@ export function Graph() {
             id: `${index}`,
             source: edge.source,
             target: edge.target,
-            sourceHandle: "a",
-            targetHandle: "b",
+            sourceHandle: "source",
+            targetHandle: "target",
             type: 'smoothstep', 
             markerEnd: {
               type: 'arrowclosed',
@@ -40,16 +41,16 @@ export function Graph() {
             },
         }));
 
-      setNodes(data.nodes);
+      setNodes(data.nodes)
      setEdges(processedEdges);
     }
-  }, [data]);
-  
+  },
+   [data]);
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
   
   return (
-    <div style={{ width: '600px', height: '600px', border: '2px solid blue' }}>
+    <div className={styles.graphContainer}>
 
       <ReactFlow 
         nodes={nodes}
@@ -69,11 +70,11 @@ export function Graph() {
     edges={edges}
     data={data} 
     onClose={() => setSelectedNode(null)}
-    onSave={(nodeId, inputMapping) => {
+    onSave={(nodeId) => {
       setNodes(currentNodes =>
         currentNodes.map(node =>
           node.id === nodeId
-            ? { ...node, data: { ...node.data, input_mapping: inputMapping } }
+            ? { ...node, data: { ...node.data,  } }
             : node
         )
       );

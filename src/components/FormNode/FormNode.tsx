@@ -1,4 +1,4 @@
-import { FormNodeData } from "../../types/types";
+import {NodeData} from '../../types/types'
 import styles from './styles.module.css';
 import {Handle, Position} from "@xyflow/react";
 
@@ -7,7 +7,9 @@ enum NodeTypes {
     source = "source",
 }
 
-export const FormNode = ( data: FormNodeData ) => {
+
+
+export const FormNode = ({ data }: { data: NodeData }) => {
     return (
       <div className={styles.formNode}>
         <Handle
@@ -17,7 +19,7 @@ export const FormNode = ( data: FormNodeData ) => {
           className={styles.nodeHandle}
         />
 
-        <div className={styles.formNodeTitle}>{data.name || 'Form'}</div>
+        <div className={styles.formNodeTitle}>{data.name}</div>
         
         <Handle
           type="source"

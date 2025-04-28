@@ -1,34 +1,66 @@
 import React, { useState } from "react";
 import { PrefillSourceModal } from "../PrefillSourceModal/PrefillSourceModal";
 import { Node } from "../../types/types";
-import { Edge } from  '@xyflow/react';
+import { Edge } from '@xyflow/react';
+import styles from './styles.module.css';
 
+
+interface FormSchema {
+  id: string;
+  field_schema: {
+    properties: Record<string, any>;
+  };
+}
+
+interface FieldData {
+  field: string;
+  formName: string;
+  formId: string;
+}
+
+interface SourceData {
+  label: string;
+  fields: FieldData[];
+}
+
+interface MappingData {
+  sourceType: "global" | "form";
+  sourceFormId: string;
+  sourceField: string;
+}
+
+interface PanelData {
+  forms: FormSchema[];
+  // Add other properties as needed
+}
 
 // Helper: get form schema for a node
-function getFormSchema(node: any, forms: any[]) {
+function getFormSchema(node: Node, forms: FormSchema[]): FormSchema | undefined {
   return forms.find(f => f.id === node.data.component_id);
 }
 
 // Helper: get all field names for a form
-function getFieldNames(formSchema: any) {
+function getFieldNames(formSchema: FormSchema): string[] {
   return Object.keys(formSchema.field_schema.properties);
 }
 
 // Helper: get direct and transitive dependencies
-function getUpstreamForms(node: any, nodes: any[]) {
-  const visited = new Set();
-  const result: any[] = [];
-  function dfs(n: any) {
+function getUpstreamForms(node: Node, nodes: Node[]): Node[] {
+  const visited = new Set<string>();
+  const result: Node[] = [];
+  
+  function dfs(n: Node): void {
     if (visited.has(n.id)) return;
     visited.add(n.id);
     for (const prereqId of n.data.prerequisites || []) {
-      const prereqNode = nodes.find((x: any) => x.id === prereqId);
+      const prereqNode = nodes.find(x => x.id === prereqId);
       if (prereqNode) {
         result.push(prereqNode);
         dfs(prereqNode);
       }
     }
   }
+  
   dfs(node);
   return result;
 }
@@ -49,12 +81,12 @@ export const PrefillMappingPanel = ({
   node: Node;
   nodes: Node[];
   edges: Edge[];
-  data: any;
+  data: PanelData;
   onClose: () => void;
-  onSave: (nodeId: string, inputMapping: any) => void;
-})=> {
+  onSave: (nodeId: string, inputMapping: Record<string, MappingData>) => void;
+}) => {
   const [modalField, setModalField] = useState<string | null>(null);
-  const [inputMapping, setInputMapping] = useState(
+  const [inputMapping, setInputMapping] = useState<Record<string, MappingData>>(
     node.data.input_mapping || {}
   );
 
@@ -65,37 +97,40 @@ export const PrefillMappingPanel = ({
   // Data sources
   const directDeps = (node.data.prerequisites || []).map((id: string) =>
     nodes.find(n => n.id === id)
-  );
+  ).filter(Boolean) as Node[];
+  
   const transitiveDeps = getUpstreamForms(node, nodes).filter(
     n => !directDeps.includes(n)
   );
 
-  // Modal: all sources
-  const sources = [
-    ...directDeps.map(dep =>
-      dep
-        ? {
-            label: `Direct: ${dep.data.name}`,
-            fields: getFieldNames(getFormSchema(dep, data.forms)).map(f => ({
-              field: f,
-              formName: dep.data.name,
-              formId: dep.id
-            }))
-          }
-        : null
-    ),
-    ...transitiveDeps.map(dep =>
-      dep
-        ? {
-            label: `Transitive: ${dep.data.name}`,
-            fields: getFieldNames(getFormSchema(dep, data.forms)).map(f => ({
-              field: f,
-              formName: dep.data.name,
-              formId: dep.id
-            }))
-          }
-        : null
-    ),
+  // Define sources for the modal
+  const sources: SourceData[] = [
+    ...directDeps.map(dep => {
+      const depSchema = getFormSchema(dep, data.forms);
+      if (!depSchema) return null;
+      
+      return {
+        label: `Direct: ${dep.data.name}`,
+        fields: getFieldNames(depSchema).map(f => ({
+          field: f,
+          formName: dep.data.name,
+          formId: dep.id
+        }))
+      };
+    }),
+    ...transitiveDeps.map(dep => {
+      const depSchema = getFormSchema(dep, data.forms);
+      if (!depSchema) return null;
+      
+      return {
+        label: `Transitive: ${dep.data.name}`,
+        fields: getFieldNames(depSchema).map(f => ({
+          field: f,
+          formName: dep.data.name,
+          formId: dep.id
+        }))
+      };
+    }),
     {
       label: "Global Data",
       fields: globalFields.map(f => ({
@@ -104,16 +139,16 @@ export const PrefillMappingPanel = ({
         formId: "global"
       }))
     }
-  ].filter(Boolean);
+  ].filter(Boolean) as SourceData[];
 
-  function handleRemoveMapping(field: string) {
+  function handleRemoveMapping(field: string): void {
     const newMapping = { ...inputMapping };
     delete newMapping[field];
     setInputMapping(newMapping);
     onSave(node.id, newMapping);
   }
 
-  function handleSelectPrefillSource(field: string, mapping: any) {
+  function handleSelectPrefillSource(field: string, mapping: MappingData): void {
     const newMapping = { ...inputMapping, [field]: mapping };
     setInputMapping(newMapping);
     setModalField(null);
@@ -121,20 +156,9 @@ export const PrefillMappingPanel = ({
   }
 
   return (
-    <div
-      style={{
-        position: "absolute",
-        right: 0,
-        top: 0,
-        width: 350,
-        background: "#fff",
-        border: "1px solid #ccc",
-        padding: 16,
-        zIndex: 10
-      }}
-    >
-      <h3>Prefill</h3>
-      <div style={{ marginBottom: 16, color: "#666" }}>
+    <div className={styles.panel}>
+      <h3 className={styles.title}>Prefill</h3>
+      <div className={styles.description}>
         Prefill fields for this form
       </div>
       <div>
@@ -153,29 +177,14 @@ export const PrefillMappingPanel = ({
             return (
               <div
                 key={field}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  background: "#eee",
-                  borderRadius: 20,
-                  padding: "6px 16px",
-                  marginBottom: 8,
-                  fontSize: 16
-                }}
+                className={styles.mappedField}
               >
                 <span>
                   <b>{field}</b>: {sourceFormName}.{mapping.sourceField}
                 </span>
-                <button
+                <button 
+                  className={styles.removeButton}
                   onClick={() => handleRemoveMapping(field)}
-                  style={{
-                    marginLeft: "auto",
-                    background: "none",
-                    border: "none",
-                    fontSize: 20,
-                    cursor: "pointer"
-                  }}
-                  aria-label="Remove mapping"
                 >
                   ×
                 </button>
@@ -185,19 +194,10 @@ export const PrefillMappingPanel = ({
             return (
               <div
                 key={field}
-                style={{
-                  border: "2px dashed #3399cc",
-                  borderRadius: 8,
-                  padding: "10px 16px",
-                  marginBottom: 8,
-                  color: "#3399cc",
-                  background: "#f7fbfd",
-                  cursor: "pointer",
-                  fontSize: 16
-                }}
+                className={styles.unmappedField}
                 onClick={() => setModalField(field)}
               >
-                <span style={{ marginRight: 8, fontSize: 18 }}>🗄️</span>
+                <span className={styles.fieldIcon}>🗄️</span>
                 {field}
               </div>
             );
@@ -205,18 +205,20 @@ export const PrefillMappingPanel = ({
         })}
       </div>
       {modalField && (
-         <PrefillSourceModal
-         open={!!modalField}
-         onClose={() => setModalField(null)}
-         onSelect={(mapping) => handleSelectPrefillSource(modalField, mapping)}
-         sources={sources}
-         fieldName={modalField}
-       />
-           
-          )}
-      <button onClick={onClose} style={{ marginTop: 16 }}>
+        <PrefillSourceModal
+          open={!!modalField}
+          onClose={() => setModalField(null)}
+          onSelect={(mapping) => handleSelectPrefillSource(modalField, mapping)}
+          sources={sources}
+          fieldName={modalField}
+        />
+      )}
+      <button 
+        onClick={onClose} 
+        className={styles.closeButton}
+      >
         Close
       </button>
     </div>
   );
-}
+};
