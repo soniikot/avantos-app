@@ -85,15 +85,17 @@ export const PrefillSourceModal: React.FC<PrefillSourceModalProps> = ({
           <h2 className={styles.modalTitle}>
             Select data element to map
           </h2>
+          <div>
+                <p>{fieldName}</p>
+    
+            </div>
         </div>
         
         <div className={styles.modalBody}>
           {/* Left panel with data sources */}
           <div className={styles.leftPanel}>
             <div className={styles.panelHeader}>
-              <h3 className={styles.panelTitle}>
-                Available data
-              </h3>
+           
               
               {/* Search box */}
               <div className={styles.searchContainer}>
@@ -142,7 +144,7 @@ export const PrefillSourceModal: React.FC<PrefillSourceModalProps> = ({
                           sourceFormId: "global",
                           sourceField: field.field
                         })}
-                        className={styles.fieldItem}
+                        className={styles.sourceItem}
                       >
                         {field.field}
                       </div>
@@ -177,7 +179,7 @@ export const PrefillSourceModal: React.FC<PrefillSourceModalProps> = ({
                           sourceFormId: "global",
                           sourceField: field.field
                         })}
-                        className={styles.fieldItem}
+                        className={styles.sourceItem}
                       >
                         {field.field}
                       </div>
@@ -216,7 +218,7 @@ export const PrefillSourceModal: React.FC<PrefillSourceModalProps> = ({
                             sourceFormId: field.formId,
                             sourceField: field.field
                           })}
-                          className={styles.fieldItem}
+                          className={styles.sourceItem}
                         >
                           {field.field}
                         </div>
@@ -226,17 +228,7 @@ export const PrefillSourceModal: React.FC<PrefillSourceModalProps> = ({
                 })}
             </div>
           </div>
-          
-         
-          <div className={styles.rightPanel}>
-            {/* You could show selected field info here */}
-            {fieldName && (
-              <div className={styles.selectedField}>
-                <h3 className={styles.rightPanelTitle}>Selected Field</h3>
-                <p>{fieldName}</p>
-              </div>
-            )}
-          </div>
+
         </div>
         
         {/* Footer */}
@@ -255,6 +247,6 @@ export const PrefillSourceModal: React.FC<PrefillSourceModalProps> = ({
           </button>
         </div>
       </div>
-    </div>
+      </div>
   );
 };
