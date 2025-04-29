@@ -2,8 +2,14 @@
 import React, { useState, useMemo } from 'react';
 import styles from "./styles.module.scss";
 import { CategorySection } from '../CategorySection/CategorySection';
-import { FieldData, PrefillSourceModalProps, SourceData } from '@/types/types';
+import { PrefillSourceModalProps, SourceData } from '@/GlobalTypes/types';
 import { FaSearch } from 'react-icons/fa';
+
+export interface FieldData {
+  field: string;
+  formName: string;
+  formId: string;
+}
 
 export const PrefillSourceModal: React.FC<PrefillSourceModalProps> = ({ 
   open, 
@@ -23,7 +29,6 @@ export const PrefillSourceModal: React.FC<PrefillSourceModalProps> = ({
       [itemLabel]: !prev[itemLabel]
     }));
   };
-  
   /**
    * Filters sources and fields based on search term
    */
@@ -34,20 +39,20 @@ export const PrefillSourceModal: React.FC<PrefillSourceModalProps> = ({
     
     const searchLower = searchTerm.toLowerCase();
     
-  const fieldMatchesSearch = (field:FieldData)=> {
+  const isFieldMatchesSearch = (field:FieldData)=> {
     return field.field.toLowerCase().includes(searchLower);
   };
   
-  const sourceMatchesSearch = (source: SourceData) => {
+  const isSourceMatchesSearch = (source: SourceData) => {
     return source.label.toLowerCase().includes(searchLower);
   };
   
   return sources.reduce((result: SourceData[], source) => {
-    if (sourceMatchesSearch(source)) {
+    if (isSourceMatchesSearch(source)) {
       result.push(source);
       return result;
     }
-    const filteredFields = source.fields.filter(fieldMatchesSearch);
+    const filteredFields = source.fields.filter(isFieldMatchesSearch);
     
     if (filteredFields.length > 0) {
       result.push({

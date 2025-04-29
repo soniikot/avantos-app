@@ -1,10 +1,17 @@
-import {NodeData} from '../../types/types'
 import styles from './styles.module.scss';
 import {Handle, Position} from "@xyflow/react";
 
 enum NodeTypes {
     target = "target",
     source = "source",
+}
+
+export interface NodeData {
+  name: string;
+  input_mapping?: Record<string, any>;
+  prerequisites?: string[];
+  component_id?: string;
+  [key: string]: unknown;
 }
 
 export const FormNode = ({ data }: { data: NodeData }) => {

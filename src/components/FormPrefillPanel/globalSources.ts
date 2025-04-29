@@ -1,5 +1,4 @@
-// mock global data source
-export const GLOBAL_DATA = [
+export const GLOBAL_SOURCES = [
 
   {
     title: "Action Properties",

@@ -1,5 +1,5 @@
 import styles from "./styles.module.scss";
-import type { SourceData, MappingData } from "@app-types/types";
+import type { SourceData, MappingData } from "@/GlobalTypes/types";
 import clsx from 'clsx';
 import { MdChevronRight } from "react-icons/md";
 

@@ -1,13 +1,6 @@
-
-export interface EdgeData {
-  source: string;
-  target: string;
-}
-
-
 export interface NodeData {
   name: string;
-  input_mapping?: Record<string, any>;
+  input_mapping?: Record<string, unknown>;
   prerequisites?: string[];
   component_id?: string;
   [key: string]: unknown;
@@ -23,14 +16,6 @@ export interface Node {
   data: NodeData; 
 }
 
-
-export interface FormSchema {
-  id: string;
-  field_schema: {
-    properties: Record<string, unknown>;
-  };
-}
-
 export interface FieldData {
   field: string;
   formName: string;
@@ -43,11 +28,15 @@ export interface SourceData {
 }
 
 export interface MappingData {
-  sourceType: "global" | "form";
+  sourceType: SourceType;
   sourceFormId: string;
   sourceField: string;
 }
 
+export enum SourceType {
+  FORM = "form",
+  GLOBAL = "global"
+}
 
 export interface PrefillSourceModalProps {
   open: boolean;

@@ -2,9 +2,17 @@ import React, { useState } from "react";
 import { PrefillSourceModal } from "@components/PrefillSourceModal/PrefillSourceModal";
 import { Edge } from '@xyflow/react';
 import styles from './styles.module.scss';
-import type { FormSchema, MappingData, SourceData, Node } from "@app-types/types";
+import type {  MappingData, SourceData, Node } from "@/GlobalTypes/types";
 import { FieldItem } from "@components/FieldItem/FieldItem";
-import {GLOBAL_DATA} from "../../constants/mockGlobalData";
+import {GLOBAL_SOURCES} from "./globalSources";
+
+export interface FormSchema {
+  id: string;
+  field_schema: {
+    properties: Record<string, unknown>;
+  };
+}
+
 /*
 * Find the form schema for a given node
 */
@@ -76,37 +84,53 @@ export const FormPrefillPanel = ({
 }) => {
   const [modalField, setModalField] = useState<string | null>(null);
   const [inputMapping, setInputMapping] = useState<Record<string, MappingData>>(
-    node.data.input_mapping ?? {}
+   {}
   );
 
   const formSchema = FindNodeWithFormSchema(node, forms);
   const fieldNames = getFieldNames(formSchema);
 const upstreamNodes = getUpstreamNodes(node, nodes);
 
-const sources: SourceData[] = [
-  ...upstreamNodes.map(node => {
+/**
+ * Create form sources from upstream nodes
+ */
+function createFormSources(
+  upstreamNodes: Node[], 
+  forms: FormSchema[]
+): SourceData[] {
+  return upstreamNodes.map(node => {
     const nodeSchema = FindNodeWithFormSchema(node, forms);
     const nodeFields = getFieldNames(nodeSchema);
     
     return {
-      label: `Form: ${node.data.name}`,  
+      label: `Form: ${node.data.name}`,
       fields: nodeFields.map(field => ({
         field: field,
         formName: node.data.name,
         formId: node.id
       }))
     };
-  }),
+  });
+}
 
-  ...GLOBAL_DATA.map(category => ({
-    label: category.title,  
+/**
+ * Create global sources from global source categories
+ */
+function createGlobalSources(globalSources = GLOBAL_SOURCES): SourceData[] {
+  return globalSources.map(category => ({
+    label: category.title,
     fields: category.fields.map(fieldObj => ({
       field: fieldObj.field,
       formName: "Global",
       formId: "global",
       category: category.title
     }))
-  }))
+  }));
+}
+
+const sources: SourceData[] = [
+  ...createFormSources(upstreamNodes, forms),
+  ...createGlobalSources()
 ];
 
   function handleRemoveMapping(field: string): void {

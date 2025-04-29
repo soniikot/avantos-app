@@ -4,9 +4,14 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchGraph } from "../../service/fetchGraph";
 import { useEffect, useState, useMemo } from 'react';
 import { FormPrefillPanel } from '../FormPrefillPanel/FormPrefillPanel';
-import { EdgeData, Node } from '../../types/types';
+import { Node } from '../../GlobalTypes/types';
 import { FormNode } from '../FormNode/FormNode';
 import styles from "./styles.module.css"
+
+export interface EdgeData {
+  source: string;
+  target: string;
+}
 
 
 export function Graph() {

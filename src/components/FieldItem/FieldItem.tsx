@@ -1,5 +1,6 @@
 import styles from "./styles.module.scss";
-import { MappingData , Node} from "@/types/types";
+import { MappingData , Node} from "@/GlobalTypes/types";
+import { SourceType } from "@/GlobalTypes/types";
 
 export const FieldItem = ({ 
     field, 
@@ -16,10 +17,10 @@ export const FieldItem = ({
   }) => {
     if (mapping) {
       let sourceFormName = mapping.sourceFormId;
-      if (mapping.sourceType === "form") {
+      if (mapping.sourceType === SourceType.FORM) {
         const sourceNode = nodes.find(node => node.id === mapping.sourceFormId);
         sourceFormName = sourceNode?.data.name ?? mapping.sourceFormId;
-      } else if (mapping.sourceType === "global") {
+      } else if (mapping.sourceType === SourceType.GLOBAL) {
         sourceFormName = "Global";
       }
       

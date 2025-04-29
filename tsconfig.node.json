@@ -9,10 +9,9 @@
     "paths": {
       "@/*": ["src/*"],
       "@components/*": ["src/components/*"],
-      "@app-types/*": ["src/types/*"],
+      "@app-types/*": ["src/GlobalTypes/*"],
       "@services/*": ["src/service/*"],
       "@styles/*": ["src/styles/*"],
-      "@utils/*": ["src/utils/*"],
     },
     
 

@@ -1,7 +1,7 @@
 
 import { render, screen, fireEvent, } from '@testing-library/react';
 import { PrefillSourceModal } from './PrefillSourceModal';
-import { SourceData } from '@/types/types'
+import { SourceData } from '@/GlobalTypes/types'
 import { vi, describe, expect, test, beforeEach,   } from 'vitest';
 import '@testing-library/jest-dom';
 
@@ -139,7 +139,6 @@ describe('PrefillSourceModal', () => {
       />
     );
     
- 
     fireEvent.click(screen.getByText('Form: Form A'));
     
     fireEvent.click(screen.getByText('name'));
