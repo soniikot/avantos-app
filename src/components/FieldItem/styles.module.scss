@@ -1,0 +1,36 @@
+@use '../../styles/variables.scss';
+
+.mappedField {
+    display: flex;
+    align-items: center;
+    border-radius: 20px;
+    padding: 6px 16px;
+    margin-bottom: 8px;
+    font-size: 16px;
+    background-color: var(--color-primary);
+  }
+
+  .removeButton {
+    margin-left: auto;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+  }
+
+  .unmappedField {
+    border: 2px dashed var(--color-primary);
+    border-radius: 8px;
+    padding: 10px 16px;
+    margin-bottom: 8px;
+    color: var(--color-primary);
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+    
+  .fieldIcon {
+    margin-right: 8px;
+    font-size: 18px;
+  }
+  

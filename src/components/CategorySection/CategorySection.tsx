@@ -1,4 +1,6 @@
 import styles from "./styles.module.scss";
+import type { SourceData, MappingData } from "@app-types/types";
+import clsx from 'clsx';
 
 export const CategorySection = ({ 
     title, 
@@ -27,7 +29,10 @@ export const CategorySection = ({
             width="16" 
             height="16" 
             viewBox="0 0 24 24"
-            className={`${styles.expandIcon} ${expanded ? styles.expanded : styles.collapsed}`}
+            className={clsx(
+              styles.expandIcon,
+              expanded ? styles.expanded : styles.collapsed
+            )}
           >
             <path fill="#666" d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" />
           </svg>

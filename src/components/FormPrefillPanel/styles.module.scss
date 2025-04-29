@@ -1,4 +1,4 @@
-@import '../../styles/variables.scss';
+@use '../../styles/variables.scss';
 
 .panel {
     position: absolute;
@@ -19,38 +19,8 @@
     margin-bottom: 16px;
   }
   
-  .mappedField {
-    display: flex;
-    align-items: center;
-    border-radius: 20px;
-    padding: 6px 16px;
-    margin-bottom: 8px;
-    font-size: 16px;
-  }
-  
-  .unmappedField {
-    border: 2px dashed var(--color-primary);
-    border-radius: 8px;
-    padding: 10px 16px;
-    margin-bottom: 8px;
-    color: var(--color-primary);
-    background: #f7fbfd;
-    cursor: pointer;
-    font-size: 16px;
-  }
-  
-  .fieldIcon {
-    margin-right: 8px;
-    font-size: 18px;
-  }
-  
-  .removeButton {
-    margin-left: auto;
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-  }
+
+ 
   
   .closeButton {
     margin-top: 16px;

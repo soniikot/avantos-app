@@ -1,36 +1,13 @@
 import React, { useState } from 'react';
 import styles from "./styles.module.scss";
 import {CategorySection} from '../CategorySection/CategorySection';
-// Define types for the component props
-interface FieldData {
-  field: string;
-}
-
-interface SourceData {
-  label: string;
-  fields: FieldData[];
-}
-
-interface MappingData {
-  sourceType: "global" | "form";
-  sourceFormId: string;
-  sourceField: string;
-}
-
-interface PrefillSourceModalProps {
-  open: boolean;
-  onClose: () => void;
-  onSelect: (mapping: MappingData) => void;
-  sources: SourceData[];
-  fieldName: string;
-}
+import { PrefillSourceModalProps, SourceData } from '@/types/types';
 
 export const PrefillSourceModal: React.FC<PrefillSourceModalProps> = ({ 
   open, 
   onClose, 
   onSelect, 
   sources, 
-  fieldName 
 }) => {
   if (!open) return null;
   
@@ -44,55 +21,50 @@ export const PrefillSourceModal: React.FC<PrefillSourceModalProps> = ({
     }));
   };
   
-  // Filter sources and fields based on search term
-  const getFilteredSources = (): SourceData[] => {
-    if (!searchTerm.trim()) {
-      return sources;
+/**
+ * Filters sources and fields based on search term
+ */
+const getFilteredSources = (): SourceData[] => {
+  if (!searchTerm.trim()) {
+    return sources;
+  }
+  
+  const searchLower = searchTerm.toLowerCase();
+  
+  return sources.reduce((result: SourceData[], source) => {
+
+    const filteredFields = source.fields.filter(field => 
+      field.field.toLowerCase().includes(searchLower) ||
+      source.label.toLowerCase().includes(searchLower) ||
+      (field.formName && field.formName.toLowerCase().includes(searchLower))
+    );
+    
+    if (filteredFields.length > 0) {
+      result.push({
+        ...source,
+        fields: filteredFields
+      });
     }
     
-    const searchLower = searchTerm.toLowerCase();
-    
-    return sources
-      .map(source => {
-        const filteredFields = source.fields.filter(field => 
-          field.field.toLowerCase().includes(searchLower) ||
-          source.label.toLowerCase().includes(searchLower)
-        );
-        
-        if (filteredFields.length > 0) {
-          return {
-            ...source,
-            fields: filteredFields
-          };
-        }
-        
-        return null;
-      })
-      .filter(Boolean) as SourceData[];
-  };
+    return result;
+  }, []);
+};
 const filteredSources = getFilteredSources();
 
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
-        {/* Header */}
         <div className={styles.modalHeader}>
           <h2 className={styles.modalTitle}>
             Select data element to map
           </h2>
-          <div>
-                <p>{fieldName}</p>
-    
-            </div>
         </div>
         
         <div className={styles.modalBody}>
-          {/* Left panel with data sources */}
           <div className={styles.leftPanel}>
             <div className={styles.panelHeader}>
            
               
-              {/* Search box */}
               <div className={styles.searchContainer}>
                 <input
                   type="text"
@@ -109,7 +81,6 @@ const filteredSources = getFilteredSources();
               </div>
             </div>
             
-            {/* Data sources list */}
 <div className={styles.sourcesList}>
 <CategorySection
   title="Action Properties"
@@ -117,7 +88,7 @@ const filteredSources = getFilteredSources();
   sourceLabel="Global Data"
   expanded={expandedItems["Action Properties"]}
   onToggle={() => toggleItem("Action Properties")}
-  sources={sources}
+  sources={filteredSources}
   onSelect={onSelect}
 />
 
@@ -127,7 +98,7 @@ const filteredSources = getFilteredSources();
   sourceLabel="Global Data"
   expanded={expandedItems["Client Organization Properties"]}
   onToggle={() => toggleItem("Client Organization Properties")}
-  sources={sources}
+  sources={filteredSources}
   onSelect={onSelect}
 />
 {filteredSources
@@ -139,29 +110,20 @@ const filteredSources = getFilteredSources();
         sourceLabel={source.label}
         expanded={expandedItems[source.label] || false}
         onToggle={() => toggleItem(source.label)}
-        sources={sources}
+        sources={filteredSources}
         onSelect={onSelect}
       />
     ))
   }
-
             </div>
           </div>
-
         </div>
-        
         <div className={styles.modalFooter}>
           <button
             onClick={onClose}
             className={styles.cancelButton}
           >
             CANCEL
-          </button>
-          <button
-            className={styles.selectButton}
-            disabled
-          >
-            SELECT
           </button>
         </div>
       </div>

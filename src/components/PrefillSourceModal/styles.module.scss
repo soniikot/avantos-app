@@ -145,21 +145,6 @@
     padding: 0 20px 15px;
   }
   
-  
-  .sourceItem {
-    padding: 6px 0 6px 22px;
-    cursor: pointer;
-  }
-  
-  
-  .expanded {
-    transform: rotate(90deg);
-  }
-  
-  .collapsed {
-    transform: rotate(0deg); 
-  }
-  
   .formLabel {
     border-radius: 4px;
   }
@@ -185,7 +170,6 @@
     padding: 8px 16px;
     border: none;
     border-radius: 4px;
-    color: var(--color-gray-light);
     font-size: 14px;
     cursor: default;
   }

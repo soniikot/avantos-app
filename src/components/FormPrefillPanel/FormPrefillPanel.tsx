@@ -1,40 +1,30 @@
 import React, { useState } from "react";
 import { PrefillSourceModal } from "@components/PrefillSourceModal/PrefillSourceModal";
-import type { Node } from "@app-types/types";
 import { Edge } from '@xyflow/react';
 import styles from './styles.module.scss';
-
-
-
-interface FormSchema {
-  id: string;
-  field_schema: {
-    properties: Record<string, unknown>;
-  };
-}
-
-interface FieldData {
-  field: string;
-  formName: string;
-  formId: string;
-}
-
-interface SourceData {
-  label: string;
-  fields: FieldData[];
-}
-
-interface MappingData {
-  sourceType: "global" | "form";
-  sourceFormId: string;
-  sourceField: string;
-}
+import type { FormSchema, MappingData, SourceData, Node } from "@app-types/types";
+import { FieldItem } from "@components/FieldItem/FieldItem";
 
 /*
 * Find the form schema for a given node
 */
 function FindNodeWithFormSchema(node: Node, forms: FormSchema[]){
   return forms.find(f => f.id === node.data.component_id);
+}
+
+/**
+ * Get field names from a form schema with safe handling of empty or invalid schemas
+ */
+function getFieldNames(schema: FormSchema | undefined): string[] {
+  if (!schema) return [];
+  
+  try {
+    const properties = schema?.field_schema?.properties ?? {};
+    return Object.keys(properties);
+  } catch (error) {
+    console.error("Error extracting field names:", error);
+    return [];
+  }
 }
 
 /*
@@ -96,27 +86,27 @@ export const FormPrefillPanel = ({
   );
 
   const formSchema = FindNodeWithFormSchema(node, forms);
-  const fieldNames = formSchema ? Object.keys(formSchema.field_schema.properties) : [];
+  const fieldNames = getFieldNames(formSchema);
 const upstreamNodes = getUpstreamNodes(node, nodes);
 
-const sources = [
+const sources:SourceData[] = [
 
   ...upstreamNodes.map(node => {
-    const nodeSchema = FindNodeWithFormSchema(node, forms);
-    if (!nodeSchema) return null;
-    
     return {
       label: `Form: ${node.data.name}`,  
-      fields: Object.keys(nodeSchema.field_schema.properties).map(field => ({
-        field: field
+      fields: fieldNames.map(field => ({
+        field: field,
+        formName: node.data.name,
+        formId: node.id
       }))
-    };
-  }),
-  
+  }}),
+
   {
     label: "Global Data",
     fields: globalFields.map(f => ({
       field: f.field,
+      formName: "Global",
+      formId: "global"
     }))
   }
 ]
@@ -126,7 +116,7 @@ const sources = [
     delete newMapping[field];
     setInputMapping(newMapping);
     onSave(node.id, newMapping);
-  }
+  }modalField
 
   function handleSelectPrefillSource(field: string, mapping: MappingData): void {
     const newMapping = { ...inputMapping, [field]: mapping };
@@ -137,53 +127,23 @@ const sources = [
 
   return (
     <div className={styles.panel}>
-      <h3 className={styles.title}>Prefill</h3>
       <div className={styles.description}>
         Prefill fields for this form
       </div>
-      <div>
-        {fieldNames.map(field => {
-          const mapping = inputMapping[field];
-          if (mapping) {
-            let sourceFormName = mapping.sourceFormId;
-            if (mapping.sourceType === "form") {
-              const sourceNode = nodes.find(
-                n => n.id === mapping.sourceFormId
-              );
-              sourceFormName = sourceNode?.data.name || mapping.sourceFormId;
-            } else if (mapping.sourceType === "global") {
-              sourceFormName = "Global";
-            }
-            return (
-              <div
-                key={field}
-                className={styles.mappedField}
-              >
-                <span>
-                  <b>{field}</b>: {sourceFormName}.{mapping.sourceField}
-                </span>
-                <button 
-                  className={styles.removeButton}
-                  onClick={() => handleRemoveMapping(field)}
-                >
-                  ×
-                </button>
-              </div>
-            );
-          } else {
-            return (
-              <div
-                key={field}
-                className={styles.unmappedField}
-                onClick={() => setModalField(field)}
-              >
-                <span className={styles.fieldIcon}>🗄️</span>
-                {field}
-              </div>
-            );
-          }
-        })}
+      
+      <div className={styles.fieldsList}>
+        {fieldNames.map(field => (
+          <FieldItem 
+            key={field}
+            field={field}
+            mapping={inputMapping[field]} 
+            nodes={nodes}
+            onRemove={handleRemoveMapping}
+            onAdd={() => setModalField(field)}
+          />
+        ))}
       </div>
+      
       {modalField && (
         <PrefillSourceModal
           open={!!modalField}
