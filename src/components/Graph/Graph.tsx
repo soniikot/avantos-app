@@ -3,7 +3,7 @@ import '@xyflow/react/dist/style.css';
 import { useQuery } from "@tanstack/react-query";
 import { fetchGraph } from "../../service/fetchGraph";
 import { useEffect, useState, useMemo } from 'react';
-import { PrefillMappingPanel } from '../PrefillMappingPanel/PrefillMappingPanel';
+import { FormPrefillPanel } from '../FormPrefillPanel/FormPrefillPanel';
 import { EdgeData, Node } from '../../types/types';
 import { FormNode } from '../FormNode/FormNode';
 import styles from "./styles.module.css"
@@ -64,7 +64,7 @@ export function Graph() {
         <Background />
       </ReactFlow>
       {selectedNode && (
-  <PrefillMappingPanel
+  <FormPrefillPanel
     node={selectedNode}
     nodes={nodes}
     edges={edges}

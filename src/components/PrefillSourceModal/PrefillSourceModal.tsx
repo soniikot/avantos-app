@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import styles from "./styles.module.css";
-
+import styles from "./styles.module.scss";
+import {CategorySection} from '../CategorySection/CategorySection';
 // Define types for the component props
 interface FieldData {
   field: string;
-  formName: string;
-  formId: string;
 }
 
 interface SourceData {
@@ -39,7 +37,6 @@ export const PrefillSourceModal: React.FC<PrefillSourceModalProps> = ({
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
   
-  // Toggle expansion state of an item
   const toggleItem = (itemLabel: string): void => {
     setExpandedItems(prev => ({
       ...prev,
@@ -57,7 +54,6 @@ export const PrefillSourceModal: React.FC<PrefillSourceModalProps> = ({
     
     return sources
       .map(source => {
-        // Filter fields in this source
         const filteredFields = source.fields.filter(field => 
           field.field.toLowerCase().includes(searchLower) ||
           source.label.toLowerCase().includes(searchLower)
@@ -74,8 +70,7 @@ export const PrefillSourceModal: React.FC<PrefillSourceModalProps> = ({
       })
       .filter(Boolean) as SourceData[];
   };
-  
-  const filteredSources = getFilteredSources();
+const filteredSources = getFilteredSources();
 
   return (
     <div className={styles.modalOverlay}>
@@ -115,123 +110,46 @@ export const PrefillSourceModal: React.FC<PrefillSourceModalProps> = ({
             </div>
             
             {/* Data sources list */}
-            <div className={styles.sourcesList}>
-              {/* Global Properties */}
-              <div className={styles.categoryContainer}>
-                <div 
-                  onClick={() => toggleItem("Action Properties")}
-                  className={styles.categoryHeader}
-                >
-                  <svg 
-                    width="16" 
-                    height="16" 
-                    viewBox="0 0 24 24"
-                    className={`${styles.expandIcon} ${expandedItems["Action Properties"] ? styles.expanded : styles.collapsed}`}
-                  >
-                    <path fill="#666" d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" />
-                  </svg>
-                  <span>Action Properties</span>
-                </div>
-                
-                {expandedItems["Action Properties"] && 
-                  sources.find(s => s.label === "Global Data")?.fields
-                    .filter(f => f.formName === "Global" && f.field.startsWith("action_"))
-                    .map(field => (
-                      <div 
-                        key={field.field}
-                        onClick={() => onSelect({
-                          sourceType: "global",
-                          sourceFormId: "global",
-                          sourceField: field.field
-                        })}
-                        className={styles.sourceItem}
-                      >
-                        {field.field}
-                      </div>
-                    ))
-                }
-              </div>
-              
-              <div className={styles.categoryContainer}>
-                <div 
-                  onClick={() => toggleItem("Client Organisation Properties")}
-                  className={styles.categoryHeader}
-                >
-                  <svg 
-                    width="16" 
-                    height="16" 
-                    viewBox="0 0 24 24"
-                    className={`${styles.expandIcon} ${expandedItems["Client Organisation Properties"] ? styles.expanded : styles.collapsed}`}
-                  >
-                    <path fill="#666" d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" />
-                  </svg>
-                  <span>Client Organisation Properties</span>
-                </div>
-                
-                {expandedItems["Client Organisation Properties"] && 
-                  sources.find(s => s.label === "Global Data")?.fields
-                    .filter(f => f.formName === "Global" && f.field.startsWith("organization_"))
-                    .map(field => (
-                      <div 
-                        key={field.field}
-                        onClick={() => onSelect({
-                          sourceType: "global",
-                          sourceFormId: "global",
-                          sourceField: field.field
-                        })}
-                        className={styles.sourceItem}
-                      >
-                        {field.field}
-                      </div>
-                    ))
-                }
-              </div>
-              
-              {/* Forms */}
-              {filteredSources
-                .filter(source => source.label !== "Global Data")
-                .map(source => {
-                  // Extract form name from label (e.g., "Direct: Form A" -> "Form A")
-                  const formName = source.label.split(": ")[1];
-                  return (
-                    <div key={source.label} className={styles.categoryContainer}>
-                      <div 
-                        onClick={() => toggleItem(source.label)}
-                        className={`${styles.formHeader} ${expandedItems[source.label] ? styles.expandedForm : ''}`}
-                      >
-                        <svg 
-                          width="16" 
-                          height="16" 
-                          viewBox="0 0 24 24"
-                          className={`${styles.expandIcon} ${expandedItems[source.label] ? styles.expanded : styles.collapsed}`}
-                        >
-                          <path fill="#666" d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" />
-                        </svg>
-                        <span>{formName}</span>
-                      </div>
-                      
-                      {expandedItems[source.label] && source.fields.map(field => (
-                        <div 
-                          key={field.formId + field.field}
-                          onClick={() => onSelect({
-                            sourceType: field.formId === "global" ? "global" : "form",
-                            sourceFormId: field.formId,
-                            sourceField: field.field
-                          })}
-                          className={styles.sourceItem}
-                        >
-                          {field.field}
-                        </div>
-                      ))}
-                    </div>
-                  );
-                })}
+<div className={styles.sourcesList}>
+<CategorySection
+  title="Action Properties"
+  fieldPrefix="action_"
+  sourceLabel="Global Data"
+  expanded={expandedItems["Action Properties"]}
+  onToggle={() => toggleItem("Action Properties")}
+  sources={sources}
+  onSelect={onSelect}
+/>
+
+<CategorySection
+  title="Client Organization Properties"
+  fieldPrefix="action_"
+  sourceLabel="Global Data"
+  expanded={expandedItems["Client Organization Properties"]}
+  onToggle={() => toggleItem("Client Organization Properties")}
+  sources={sources}
+  onSelect={onSelect}
+/>
+{filteredSources
+    .filter(source => source.label !== "Global Data")
+    .map(source => (
+      <CategorySection
+        key={source.label}
+        title={source.label.replace("Form: ", "")}
+        sourceLabel={source.label}
+        expanded={expandedItems[source.label] || false}
+        onToggle={() => toggleItem(source.label)}
+        sources={sources}
+        onSelect={onSelect}
+      />
+    ))
+  }
+
             </div>
           </div>
 
         </div>
         
-        {/* Footer */}
         <div className={styles.modalFooter}>
           <button
             onClick={onClose}

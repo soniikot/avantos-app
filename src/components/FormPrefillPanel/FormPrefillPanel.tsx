@@ -1,15 +1,15 @@
 import React, { useState } from "react";
-import { PrefillSourceModal } from "../PrefillSourceModal/PrefillSourceModal";
-import { Node } from "../../types/types";
+import { PrefillSourceModal } from "@components/PrefillSourceModal/PrefillSourceModal";
+import type { Node } from "@app-types/types";
 import { Edge } from '@xyflow/react';
-import styles from './styles.module.css';
+import styles from './styles.module.scss';
+
 
 
 interface FormSchema {
   id: string;
   field_schema: {
-
-    properties: Record<string, any>;
+    properties: Record<string, unknown>;
   };
 }
 
@@ -30,42 +30,43 @@ interface MappingData {
   sourceField: string;
 }
 
-// Helper: get form schema for a node
-function getFormSchema(node: Node, forms: FormSchema[]){
+/*
+* Find the form schema for a given node
+*/
+function FindNodeWithFormSchema(node: Node, forms: FormSchema[]){
   return forms.find(f => f.id === node.data.component_id);
 }
 
-// Helper: get all field names for a form
-function getFieldNames(formSchema: FormSchema): string[] {
-  return Object.keys(formSchema.field_schema.properties);
-}
-
-
-// Helper: get direct and transitive dependencies
-function getUpstreamForms(node: Node, nodes: Node[]): Node[] {
+/*
+* Get all upstream nodes for a given node
+*/
+function getUpstreamNodes(node: Node, nodes: Node[]): Node[] {
   const visited = new Set<string>();
   const result: Node[] = [];
   
-  function dfs(n: Node): void {
-    if (visited.has(n.id)) return;
-    visited.add(n.id);
+  function traverseGraph(currentNode: Node): void {
+    if (visited.has(currentNode.id)) return;
+    visited.add(currentNode.id);
     
-
-    const prerequisites = n.data.prerequisites || [];
+    const upstreamNodes = currentNode.data.prerequisites ?? [];
+    if (upstreamNodes.length === 0) return;
     
-    for (const prereqId of prerequisites) {
-      const prereqNode = nodes.find(x => x.id === prereqId);
-      if (prereqNode) {
-        // Add to result if not already added
-        if (!result.some(existingNode => existingNode.id === prereqNode.id)) {
-          result.push(prereqNode);
+    upstreamNodes.forEach(upstreamNodeId => {
+      const upstreamNode = nodes.find(node => node.id === upstreamNodeId);
+      
+      if (upstreamNode) {
+        const isDuplicate = result.some(existingNode => existingNode.id === upstreamNode.id);
+        
+        if (!isDuplicate) {
+          result.push(upstreamNode);
         }
-        dfs(prereqNode);
+        
+        traverseGraph(upstreamNode);
       }
+    });
     }
-  }
   
-  dfs(node);
+  traverseGraph(node);
   return result;
 }
 
@@ -75,7 +76,7 @@ const globalFields = [
   { field: "action_type", label: "action_type" }
 ];
 
-export const PrefillMappingPanel = ({
+export const FormPrefillPanel = ({
   node,
   nodes,
   forms,
@@ -91,28 +92,23 @@ export const PrefillMappingPanel = ({
 }) => {
   const [modalField, setModalField] = useState<string | null>(null);
   const [inputMapping, setInputMapping] = useState<Record<string, MappingData>>(
-    node.data.input_mapping || {}
+    node.data.input_mapping ?? {}
   );
 
-  const formSchema = getFormSchema(node, forms);
-  const fieldNames = formSchema ? getFieldNames(formSchema) : [];
+  const formSchema = FindNodeWithFormSchema(node, forms);
+  const fieldNames = formSchema ? Object.keys(formSchema.field_schema.properties) : [];
+const upstreamNodes = getUpstreamNodes(node, nodes);
 
-  // Get all upstream forms in one collection
-const allDependencyForms = getUpstreamForms(node, nodes);
+const sources = [
 
-// Define sources for the modal with simplified categories
-const sources: SourceData[] = [
-
-  ...allDependencyForms.map(dep => {
-    const depSchema = getFormSchema(dep, forms);
-    if (!depSchema) return null;
+  ...upstreamNodes.map(node => {
+    const nodeSchema = FindNodeWithFormSchema(node, forms);
+    if (!nodeSchema) return null;
     
     return {
-      label: `Form: ${dep.data.name}`,  
-      fields: getFieldNames(depSchema).map(f => ({
-        field: f,
-        formName: dep.data.name,
-        formId: dep.id
+      label: `Form: ${node.data.name}`,  
+      fields: Object.keys(nodeSchema.field_schema.properties).map(field => ({
+        field: field
       }))
     };
   }),
@@ -121,11 +117,9 @@ const sources: SourceData[] = [
     label: "Global Data",
     fields: globalFields.map(f => ({
       field: f.field,
-      formName: "Global",
-      formId: "global"
     }))
   }
-].filter(Boolean) as SourceData[];
+]
 
   function handleRemoveMapping(field: string): void {
     const newMapping = { ...inputMapping };
