@@ -1,3 +1,5 @@
+@import '../../styles/variables.scss';
+
 .panel {
     position: absolute;
     right: 0;
@@ -15,13 +17,11 @@
   
   .description {
     margin-bottom: 16px;
-    color: #666;
   }
   
   .mappedField {
     display: flex;
     align-items: center;
-    background: #eee;
     border-radius: 20px;
     padding: 6px 16px;
     margin-bottom: 8px;
@@ -29,11 +29,11 @@
   }
   
   .unmappedField {
-    border: 2px dashed #3399cc;
+    border: 2px dashed var(--color-primary);
     border-radius: 8px;
     padding: 10px 16px;
     margin-bottom: 8px;
-    color: #3399cc;
+    color: var(--color-primary);
     background: #f7fbfd;
     cursor: pointer;
     font-size: 16px;

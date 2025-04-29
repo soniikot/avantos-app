@@ -1,5 +1,5 @@
 import {NodeData} from '../../types/types'
-import styles from './styles.module.css';
+import styles from './styles.module.scss';
 import {Handle, Position} from "@xyflow/react";
 
 enum NodeTypes {

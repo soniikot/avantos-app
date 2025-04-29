@@ -1,8 +1,10 @@
+@import '../../styles/variables.scss';
+
 .formNode {
     padding: 10px;
     border-radius: 5px;
-    border: 1px solid #6495ed;
-    background-color: #f0f8ff;
+    border: 1px solid var(--color-primary);
+    background: var( --color-white);
     min-width: 150px;
     text-align: center;
     position: relative;
@@ -13,5 +15,5 @@
   }
   
   .nodeHandle {
-    background: #555;
+    background: var(--color-primary);
   }
