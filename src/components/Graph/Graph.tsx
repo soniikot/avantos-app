@@ -13,7 +13,6 @@ export interface EdgeData {
   target: string;
 }
 
-
 export function Graph() {
   const nodeTypes = useMemo(() => ({ form: FormNode  }), []);
 

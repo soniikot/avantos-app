@@ -10,7 +10,7 @@
     background-color: var(--color-primary);
   }
 
-  .removeButton {
+.removeButton {
     margin-left: auto;
     background: none;
     border: none;
@@ -18,7 +18,7 @@
     cursor: pointer;
   }
 
-  .unmappedField {
+.unmappedField {
     border: 2px dashed var(--color-primary);
     border-radius: 8px;
     padding: 10px 16px;
@@ -28,7 +28,7 @@
     font-size: 16px;
   }
 
-  .fieldIcon {
+.fieldIcon {
     margin-right: 8px;
     font-size: 18px;
   }

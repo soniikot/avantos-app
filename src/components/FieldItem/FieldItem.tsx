@@ -1,6 +1,5 @@
 import styles from "./styles.module.scss";
-import { MappingData , Node} from "@/GlobalTypes/types";
-import { SourceType } from "@/GlobalTypes/types";
+import { MappingData , Node, SourceType} from "@/GlobalTypes/types";
 
 export const FieldItem = ({ 
     field, 
@@ -24,7 +23,6 @@ export const FieldItem = ({
         sourceFormName = "Global";
       }
       
-
       return (
         <div className={styles.mappedField}>
           <span>
