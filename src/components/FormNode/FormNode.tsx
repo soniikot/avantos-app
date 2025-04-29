@@ -7,8 +7,6 @@ enum NodeTypes {
     source = "source",
 }
 
-
-
 export const FormNode = ({ data }: { data: NodeData }) => {
     return (
       <div className={styles.formNode}>

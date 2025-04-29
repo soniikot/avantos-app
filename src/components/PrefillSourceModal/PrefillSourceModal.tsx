@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+
+import React, { useState, useMemo } from 'react';
 import styles from "./styles.module.scss";
-import {CategorySection} from '../CategorySection/CategorySection';
-import { PrefillSourceModalProps, SourceData } from '@/types/types';
+import { CategorySection } from '../CategorySection/CategorySection';
+import { FieldData, PrefillSourceModalProps, SourceData } from '@/types/types';
+import { FaSearch } from 'react-icons/fa';
 
 export const PrefillSourceModal: React.FC<PrefillSourceModalProps> = ({ 
   open, 
   onClose, 
   onSelect, 
   sources, 
+  fieldName
 }) => {
   if (!open) return null;
   
@@ -21,23 +24,30 @@ export const PrefillSourceModal: React.FC<PrefillSourceModalProps> = ({
     }));
   };
   
-/**
- * Filters sources and fields based on search term
- */
-const getFilteredSources = (): SourceData[] => {
-  if (!searchTerm.trim()) {
-    return sources;
-  }
+  /**
+   * Filters sources and fields based on search term
+   */
+  const filteredSources = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return sources;
+    }
+    
+    const searchLower = searchTerm.toLowerCase();
+    
+  const fieldMatchesSearch = (field:FieldData)=> {
+    return field.field.toLowerCase().includes(searchLower);
+  };
   
-  const searchLower = searchTerm.toLowerCase();
+  const sourceMatchesSearch = (source: SourceData) => {
+    return source.label.toLowerCase().includes(searchLower);
+  };
   
   return sources.reduce((result: SourceData[], source) => {
-
-    const filteredFields = source.fields.filter(field => 
-      field.field.toLowerCase().includes(searchLower) ||
-      source.label.toLowerCase().includes(searchLower) ||
-      (field.formName && field.formName.toLowerCase().includes(searchLower))
-    );
+    if (sourceMatchesSearch(source)) {
+      result.push(source);
+      return result;
+    }
+    const filteredFields = source.fields.filter(fieldMatchesSearch);
     
     if (filteredFields.length > 0) {
       result.push({
@@ -48,23 +58,20 @@ const getFilteredSources = (): SourceData[] => {
     
     return result;
   }, []);
-};
-const filteredSources = getFilteredSources();
+}, [sources, searchTerm]);
 
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
         <div className={styles.modalHeader}>
           <h2 className={styles.modalTitle}>
-            Select data element to map
+            Select data source for "{fieldName}"
           </h2>
         </div>
         
         <div className={styles.modalBody}>
-          <div className={styles.leftPanel}>
+       
             <div className={styles.panelHeader}>
-           
-              
               <div className={styles.searchContainer}>
                 <input
                   type="text"
@@ -74,47 +81,29 @@ const filteredSources = getFilteredSources();
                   className={styles.searchInput}
                 />
                 <div className={styles.searchIcon}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#999">
-                    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-                  </svg>
+                <FaSearch size={13}  />
                 </div>
               </div>
-            </div>
+        
             
-<div className={styles.sourcesList}>
-<CategorySection
-  title="Action Properties"
-  fieldPrefix="action_"
-  sourceLabel="Global Data"
-  expanded={expandedItems["Action Properties"]}
-  onToggle={() => toggleItem("Action Properties")}
-  sources={filteredSources}
-  onSelect={onSelect}
-/>
-
-<CategorySection
-  title="Client Organization Properties"
-  fieldPrefix="action_"
-  sourceLabel="Global Data"
-  expanded={expandedItems["Client Organization Properties"]}
-  onToggle={() => toggleItem("Client Organization Properties")}
-  sources={filteredSources}
-  onSelect={onSelect}
-/>
-{filteredSources
-    .filter(source => source.label !== "Global Data")
-    .map(source => (
-      <CategorySection
-        key={source.label}
-        title={source.label.replace("Form: ", "")}
-        sourceLabel={source.label}
-        expanded={expandedItems[source.label] || false}
-        onToggle={() => toggleItem(source.label)}
-        sources={filteredSources}
-        onSelect={onSelect}
-      />
-    ))
-  }
+            <div className={styles.sourcesList}>
+              {filteredSources.map(source => (
+                <CategorySection
+                  key={source.label}
+                  title={source.label}
+                  sourceLabel={source.label}
+                  expanded={expandedItems[source.label] ?? !!searchTerm}
+                  onToggle={() => toggleItem(source.label)}
+                  sources={filteredSources}
+                  onSelect={onSelect}
+                />
+              ))}
+              
+              {filteredSources.length === 0 && searchTerm && (
+                <div className={styles.noResults}>
+                  No matches found for "{searchTerm}"
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -127,6 +116,6 @@ const filteredSources = getFilteredSources();
           </button>
         </div>
       </div>
-      </div>
+    </div>
   );
 };

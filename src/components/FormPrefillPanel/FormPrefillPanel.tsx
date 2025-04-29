@@ -4,7 +4,7 @@ import { Edge } from '@xyflow/react';
 import styles from './styles.module.scss';
 import type { FormSchema, MappingData, SourceData, Node } from "@app-types/types";
 import { FieldItem } from "@components/FieldItem/FieldItem";
-
+import {GLOBAL_DATA} from "../../constants/mockGlobalData";
 /*
 * Find the form schema for a given node
 */
@@ -60,12 +60,6 @@ function getUpstreamNodes(node: Node, nodes: Node[]): Node[] {
   return result;
 }
 
-// Mock global data
-const globalFields = [
-  { field: "organization_name", label: "organization_name" },
-  { field: "action_type", label: "action_type" }
-];
-
 export const FormPrefillPanel = ({
   node,
   nodes,
@@ -89,34 +83,38 @@ export const FormPrefillPanel = ({
   const fieldNames = getFieldNames(formSchema);
 const upstreamNodes = getUpstreamNodes(node, nodes);
 
-const sources:SourceData[] = [
-
+const sources: SourceData[] = [
   ...upstreamNodes.map(node => {
+    const nodeSchema = FindNodeWithFormSchema(node, forms);
+    const nodeFields = getFieldNames(nodeSchema);
+    
     return {
       label: `Form: ${node.data.name}`,  
-      fields: fieldNames.map(field => ({
+      fields: nodeFields.map(field => ({
         field: field,
         formName: node.data.name,
         formId: node.id
       }))
-  }}),
+    };
+  }),
 
-  {
-    label: "Global Data",
-    fields: globalFields.map(f => ({
-      field: f.field,
+  ...GLOBAL_DATA.map(category => ({
+    label: category.title,  
+    fields: category.fields.map(fieldObj => ({
+      field: fieldObj.field,
       formName: "Global",
-      formId: "global"
+      formId: "global",
+      category: category.title
     }))
-  }
-]
+  }))
+];
 
   function handleRemoveMapping(field: string): void {
     const newMapping = { ...inputMapping };
     delete newMapping[field];
     setInputMapping(newMapping);
     onSave(node.id, newMapping);
-  }modalField
+  }
 
   function handleSelectPrefillSource(field: string, mapping: MappingData): void {
     const newMapping = { ...inputMapping, [field]: mapping };
@@ -128,7 +126,7 @@ const sources:SourceData[] = [
   return (
     <div className={styles.panel}>
       <div className={styles.description}>
-        Prefill fields for this form
+        Prefill fields for form {node.data.name}
       </div>
       
       <div className={styles.fieldsList}>

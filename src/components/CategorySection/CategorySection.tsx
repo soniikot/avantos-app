@@ -1,10 +1,15 @@
 import styles from "./styles.module.scss";
 import type { SourceData, MappingData } from "@app-types/types";
 import clsx from 'clsx';
+import { MdChevronRight } from "react-icons/md";
+
+export enum SourceType {
+  FORM = "form",
+  GLOBAL = "global"
+}
 
 export const CategorySection = ({ 
     title, 
-    fieldPrefix, 
     expanded, 
     onToggle, 
     sources, 
@@ -25,37 +30,36 @@ export const CategorySection = ({
           onClick={onToggle}
           className={styles.categoryHeader}
         >
-          <svg 
-            width="16" 
-            height="16" 
-            viewBox="0 0 24 24"
-            className={clsx(
-              styles.expandIcon,
-              expanded ? styles.expanded : styles.collapsed
-            )}
-          >
-            <path fill="#666" d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" />
-          </svg>
+         <MdChevronRight 
+  className={clsx(
+    styles.expandIcon,
+    expanded ? styles.expanded : styles.collapsed
+  )}
+  size={16}
+/>
           <span>{title}</span>
         </div>
         
-        {expanded && 
-        sources.find(source => source.label === sourceLabel)?.fields
-          ?.filter(field => !fieldPrefix || field.field.startsWith(fieldPrefix))
-          .map(field => (
-            <div 
+        {expanded &&
+        sources
+          .find((source) => source.label === sourceLabel)
+          ?.fields?.map((field) => (
+            <div
               key={field.field}
-              onClick={() => onSelect({
-                sourceType: field.formId === "global" ? "global" : "form",
-                sourceFormId: field.formId,
-                sourceField: field.field
-              })}
+              onClick={() =>
+                onSelect({
+                  sourceType: sourceLabel.includes("Form") 
+                            ? SourceType.FORM 
+                            : SourceType.GLOBAL,
+                  sourceFormId: field.formId,
+                  sourceField: field.field,
+                })
+              }
               className={styles.sourceItem}
             >
               {field.field}
             </div>
-          ))
-      }
+          ))}
       </div>
     );
   };

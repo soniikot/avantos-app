@@ -1,56 +1,4 @@
-
-  .title {
-    margin-top: 0;
-    margin-bottom: 8px;
-    font-size: 20px;
-  }
-  
-  .description {
-    margin-bottom: 16px;
-    color: var(--color-gray-dark);
-  }
-  
-  .mappedField {
-    display: flex;
-    align-items: center;
-    background: var(--color-gray-light);
-    border-radius: 20px;
-    padding: 6px 16px;
-    margin-bottom: 8px;
-    font-size: 16px;
-  }
-  
-  
-  .fieldIcon {
-    margin-right: 8px; 
-    font-size: 18px;
-  }
-
-  .fieldItem {
-    padding: 8px;
-    padding-left: 24px; 
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.15s ease;
-    display: flex;
-    align-items: center;
-  }
-  
-  .removeButton {
-    margin-left: auto;
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-  }
-  
-  .closeButton {
-    margin-top: 16px;
-    padding: 8px 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    cursor: pointer;
-  }
+@use '../../styles/variables.scss';
   
 
   .modalOverlay {
@@ -69,22 +17,19 @@
   .modalContent {
     width: 700px;
     max-height: 80vh;
-    background: var(--color-white);
     border-radius: 8px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
- 
+    background-color: var(--color-white);
   }
   
   .modalHeader {
     padding: 15px 20px;
-    border-bottom: 1px solid #eaeaea;
     margin:20px;
   }
   
   .modalTitle {
-
     margin: 0;
     font-size: 18px;
     font-weight: 500;
@@ -98,36 +43,16 @@
     overflow: hidden; 
   }
   
-
-  .leftPanel {
-    flex: 1;
-    overflow-y: auto; 
-    max-height: 460px; 
-  }
-  
-  .modalMainPanel {
-    flex: 1;
-  }
-  
-  .modalPanelContent {
-    padding: 15px 20px;
-  }
-  
-  .modalSubtitle {
-    margin: 0 0 15px;
-    font-size: 16px;
-    font-weight: 500;
-  }
-  
   .searchContainer {
     position: relative;
     margin-bottom: 15px;
+    width:500px;
   }
   
   .searchInput {
     width: 100%;
     padding: 8px 10px 8px 35px;
-    border: 1px solid #ddd;
+    border: 1px solid  var(--color-gray-light);
     border-radius: 4px;
     font-size: 14px;
   }
@@ -139,19 +64,8 @@
     transform: translateY(-50%);
   }
   
-  .sourcesList {
-    overflow-y: auto;
-    flex-grow: 1;
-    padding: 0 20px 15px;
-  }
-  
-  .formLabel {
-    border-radius: 4px;
-  }
-  
   .modalFooter {
     padding: 15px 20px;
-    border-top: 1px solid #eaeaea;
     display: flex;
     justify-content: flex-end;
     gap: 10px;
@@ -165,11 +79,21 @@
     font-size: 14px;
     cursor: pointer;
   }
+
+  .sourcesList {
+    flex: 1;
+    overflow-y: auto;
+    margin-top: 10px;
+  }
   
-  .selectButton {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    font-size: 14px;
-    cursor: default;
+  .panelHeader {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .noResults {
+    padding: 20px;
+    text-align: center;
+    color: #999;
+    font-style: italic;
   }
