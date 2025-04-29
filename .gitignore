@@ -7,10 +7,7 @@ dist-ssr
 
 
 # Local env files
-*.local
-.env.local
-# But keep the example file
-!.env.example
+.env
 
 # Editor and OS files
 .vscode/*
